@@ -22,6 +22,10 @@ target_include_directories(cadical PUBLIC
 
 target_compile_features(cadical PUBLIC cxx_std_17)
 
+if(WIN32)
+    target_link_libraries(cadical PUBLIC psapi)
+endif()
+
 # Fixed feature set: no API contracts, no tracing, frame-pointer kept for
 # profiling (-fno-omit-frame-pointer = --fp in the old configure script).
 # NBUILD skips the build.hpp generation step (version.cpp handles this).

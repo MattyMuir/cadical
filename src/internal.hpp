@@ -103,6 +103,7 @@ extern "C" {
 
 // Windows compatibility
 #ifdef _WIN32
+#define NOMINMAX
 #include <io.h>
 #include <process.h>
 #define access _access
