@@ -5,3 +5,4 @@ makefile
 *.json
 /build-release
 /build-static
+/.vs

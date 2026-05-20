@@ -11,7 +11,9 @@ extern "C" {
 #include <string.h>
 #include <sys/stat.h>
 #include <sys/types.h>
+#ifndef _WIN32
 #include <unistd.h>
+#endif
 }
 
 #ifndef _WIN32
@@ -67,7 +69,8 @@ bool File::writable (const char *path) {
   int res;
   if (!path)
     res = 1;
-  else if (!strcmp (path, "/dev/null"))
+  else if (!strcmp (path, "/dev/null") || !strcmp (path, "NUL") ||
+           !strcmp (path, "nul"))
     res = 0;
   else {
     if (!*path)
@@ -164,17 +167,28 @@ char *File::find_program (const char *prg) {
   strcpy (e, c);
   char *res = 0;
   for (char *p = e, *q; !res && p < e + len; p = q) {
-    for (q = p; *q && *q != ':'; q++)
+    for (q = p; *q && *q != PATH_SEP; q++)
       ;
     *q++ = 0;
     size_t pathlen = (q - p) + prglen;
-    char *path = new char[pathlen + 1];
+    char *path = new char[pathlen + 5]; // +5 for potential ".exe\0"
     snprintf (path, pathlen + 1, "%s/%s", p, prg);
     assert (strlen (path) == pathlen);
     if (exists (path))
       res = path;
+#ifdef _WIN32
+    else {
+      // Also try with .exe suffix on Windows
+      snprintf (path, pathlen + 5, "%s/%s.exe", p, prg);
+      if (exists (path))
+        res = path;
+      else
+        delete[] path;
+    }
+#else
     else
       delete[] path;
+#endif
   }
   delete[] e;
   return res;

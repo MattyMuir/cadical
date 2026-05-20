@@ -23,7 +23,7 @@
 // Less common 'C' header.
 
 extern "C" {
-#include <unistd.h>
+//#include <unistd.h>
 }
 
 /*------------------------------------------------------------------------*/
@@ -100,6 +100,35 @@ extern "C" {
 #include "version.hpp"
 #include "vivify.hpp"
 #include "watch.hpp"
+
+// Windows compatibility
+#ifdef _WIN32
+#include <io.h>
+#include <process.h>
+#define access _access
+#define fileno _fileno
+#define fstat _fstat
+#define stat _stat
+#define isatty _isatty
+#define getpid _getpid
+#define popen _popen
+#define pclose _pclose
+#define strdup _strdup
+#define R_OK 4
+#define W_OK 2
+#ifndef S_ISDIR
+#define S_ISDIR(m) (((m) & _S_IFMT) == _S_IFDIR)
+#endif
+#ifndef S_ISREG
+#define S_ISREG(m) (((m) & _S_IFMT) == _S_IFREG)
+#endif
+#ifndef S_ISFIFO
+#define S_ISFIFO(m) (((m) & _S_IFMT) == _S_IFIFO)
+#endif
+#define PATH_SEP ';'
+#else
+#define PATH_SEP ':'
+#endif
 
 /*------------------------------------------------------------------------*/
 
